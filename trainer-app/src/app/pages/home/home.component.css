@@ -1,0 +1,95 @@
+.home-wrapper {
+  display: flex;
+  height: 100vh;
+  background: url('/assets/images/login-bg.png') center center / cover no-repeat;
+  font-family: 'Jura', sans-serif;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #0f1923;
+  color: white;
+  padding: 32px 16px;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+}
+.sidebar li:hover,
+.sidebar li.router-link-active {
+  color: #39CE9A;
+  background-color: rgba(57, 206, 154, 0.1);
+  border-radius: 10px;
+  padding-left: 12px;
+}
+.sidebar li.active {
+  color: #39CE9A;
+  background-color: rgba(57, 206, 154, 0.1);
+  border-radius: 10px;
+  padding-left: 12px;
+}
+.main-content {
+  flex-grow: 1;
+  padding: 32px;
+  overflow-y: auto;
+  width: 100%;
+}
+.login-wrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 360px;
+  height: 100vh;
+  background-color: #121520;
+  padding: 32px;
+  z-index: 999;
+  box-shadow: -2px 0 20px rgba(0, 0, 0, 0.5);
+  animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+.icon-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.icon-close span {
+  position: absolute;
+  width: 2px;
+  height: 16px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  top: 0;
+  left: 7px;
+}
+
+.icon-close span:first-child {
+  transform: rotate(-45deg);
+}
+
+.icon-close span:last-child {
+  transform: rotate(-135deg);
+}

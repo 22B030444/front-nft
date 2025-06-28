@@ -1,0 +1,128 @@
+* {
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+}
+
+.login-wrapper {
+  font-family: 'Jura', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: url('/assets/images/login-bg.png') center center / cover no-repeat;
+}
+
+.login-card {
+  background-color: #121520;
+  width: 406px;
+  height: 302px;
+  border-radius: 20px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.login-card h2 {
+  font-size: 30px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.5%;
+}
+
+label {
+  font-size: 16px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.5%;
+  margin-bottom: 6px;
+  display: block;
+}
+
+form input {
+  width: 326px;
+  height: 48px;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background-color: #121520;
+  color: white;
+  font-size: 14px;
+  font-family: 'Jura', sans-serif;
+  margin-bottom: 12px;
+}
+
+form input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.icon-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  width: 16px;
+  height: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.icon-close span {
+  position: absolute;
+  width: 2px;
+  height: 16px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  top: 0;
+  left: 7px;
+}
+
+.icon-close span:first-child {
+  transform: rotate(-45deg);
+}
+
+.icon-close span:last-child {
+  transform: rotate(-135deg);
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.actions a {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.actions button {
+  width: 240px;
+  height: 32px;
+  background-color: #39CE9A;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'Jura', sans-serif;
+  line-height: 150%;
+  letter-spacing: 0.5%;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  align-self: center;
+  margin-top: 12px;
+  transition: background 0.3s ease;
+}
+
+.actions button:hover {
+  background-color: #2dbd88;
+}

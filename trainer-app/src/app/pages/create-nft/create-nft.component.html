@@ -1,0 +1,82 @@
+<main class="content">
+  <header class="page-header">
+    <h1>Create Item</h1>
+    <div class="header-buttons">
+      <button class="secondary-btn">
+        <img src="/assets/icons/share.png" alt="Share" /> Share
+      </button>
+      <button class="secondary-btn">
+        <img src="/assets/icons/report.png" alt="Report" /> Report
+      </button>
+    </div>
+  </header>
+
+  <form [formGroup]="form" class="form-grid" (ngSubmit)="create()">
+    <div class="upload-box">
+      <ng-container *ngIf="!previewUrl(); else preview">
+<!--        <img src="/assets/icons/upload-placeholder.svg" alt="Upload" width="48" height="48" />-->
+        <p class="upload-title">Upload File</p>
+        <p class="upload-hint">
+          Max size 100 Mb, PNG / GIF / JPG / MP4 / WEBP / MP3<br>
+                 Drop file here or
+          <label for="file" class="upload-link">choose from disk</label>
+        </p>
+        <input id="file" type="file" (change)="onFileSelected($event)" hidden />
+      </ng-container>
+
+      <ng-template #preview>
+        <img [src]="previewUrl()!" class="preview-image"  alt=""/>
+        <button type="button"
+                class="remove-btn"
+                (click)="previewUrl.set(null); form.controls.file.setValue(null)">
+          Remove
+        </button>
+      </ng-template>
+    </div>
+
+    <div class="field-col">
+      <label class="field">
+        <span class="field-label">Item Name</span>
+        <input type="text" formControlName="name" placeholder="Type here" />
+      </label>
+
+      <label class="field">
+        <span class="field-label">Category</span>
+        <select formControlName="category">
+          <option value="" disabled>Select one</option>
+          <option>Games</option>
+          <option>Collectibles</option>
+          <option>Music</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Item Type</span>
+        <select formControlName="type">
+          <option value="" disabled>Select one</option>
+          <option>Single</option>
+          <option>Bundle</option>
+        </select>
+      </label>
+
+      <label class="field price-field">
+        <span class="field-label">Price</span>
+        <div class="price-wrapper">
+          <button type="button" class="price-btn" (click)="changePrice(-1)">–</button>
+          <input type="number" formControlName="price" step="0.01" min="0" />
+          <span class="currency">QUBE</span>
+          <button type="button" class="price-btn" (click)="changePrice(1)">+</button>
+        </div>
+      </label>
+    </div>
+
+    <label class="description-box">
+      <span class="field-label">Description</span>
+      <textarea rows="6" formControlName="description" placeholder="Describe your item..."></textarea>
+    </label>
+
+    <div class="submit-wrapper">
+      <button class="primary-btn" type="submit">Create!</button>
+    </div>
+  </form>
+</main>

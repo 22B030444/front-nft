@@ -1,0 +1,33 @@
+<div class="nft-wrapper">
+  <h1 class="nft-title">NFT’s</h1>
+  <div class="search-wrapper">
+    <img src="/assets/icons/search.png" class="search-icon"  alt=""/>
+    <input class="search-input" placeholder="Search" />
+  </div>
+
+  <div class="nft-grid">
+    <div *ngFor="let nft of nfts()" class="nft-card">
+      <div class="card-bar">
+        <img class="avatar" [src]="nft.ownerAvatar" alt="avatar">
+        <p class="username">{{nft.username}}</p>
+        <button class="like" (click)="toggleLike(nft.id)">
+          ❤ <span>{{ likes(nft.id) }}</span>
+        </button>
+        <button class="more">⋯</button>
+      </div>
+
+      <img class="nft-image" [src]="nft.image" [alt]="nft.title">
+
+      <div class="nft-info">
+        <p class="nft-title">{{ nft.title }}</p>
+        <p class="nft-subtitle">{{ nft.subtitle }}</p>
+
+        <p class="nft-category">
+          Category: <span>{{ nft.category }}</span>
+        </p>
+        <p class="nft-price">$ {{ nft.price }}</p>
+        <button class="buy-btn">Buy</button>
+      </div>
+    </div>
+  </div>
+</div>

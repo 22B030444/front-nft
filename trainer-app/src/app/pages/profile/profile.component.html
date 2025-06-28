@@ -1,0 +1,30 @@
+<div class="profile-wrapper">
+  <h1 class="profile-title">Create Profile</h1>
+
+  <div class="profile-photo">
+    <div class="image-container">
+      <img [src]="previewImage || '/assets/icons/profile-placeholder.png'" alt="Profile icon" />
+      <label class="choose-image">
+        Choose Image
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" hidden />
+      </label>
+    </div>
+    <p class="format-hint">
+      Recommended format PNG or JPG,<br />
+      size is at least 300x300 px, max size 10 mb
+    </p>
+  </div>
+
+  <div class="form-group">
+    <label class="label">Username</label>
+    <input type="text" class="input" placeholder="Enter your username" [(ngModel)]="username" />
+  </div>
+
+  <div class="form-group">
+    <label class="label">Bio</label>
+    <textarea class="textarea" rows="4" placeholder="Write something about you..." [(ngModel)]="bio"></textarea>
+    <p class="symbol-count">{{ bio.length }}/300 Symbols left</p>
+  </div>
+
+  <button class="create-button" (click)="saveProfile()">Create!</button>
+</div>

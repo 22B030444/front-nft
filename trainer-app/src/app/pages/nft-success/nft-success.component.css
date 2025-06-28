@@ -1,0 +1,22 @@
+.success-wrapper {
+  padding: 64px;
+  color: white;
+}
+
+.nft-display {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-top: 24px;
+}
+
+.nft-image {
+  width: 300px;
+  border-radius: 10px;
+}
+
+.nft-text {
+  font-size: 16px;
+  max-width: 300px;
+  color: rgba(255,255,255,0.8);
+}

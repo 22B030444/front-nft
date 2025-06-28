@@ -1,0 +1,21 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <button class="icon-close">
+      <span></span>
+      <span></span>
+    </button>
+
+    <h2>Register</h2>
+
+    <form (submit)="onSubmit()">
+
+      <input type="text" id="login" placeholder="Login" [(ngModel)]="login" name="login" />
+      <input type="password" id="password" placeholder="Password" [(ngModel)]="password" name="password" />
+
+      <div class="actions">
+        <a routerLink="/login">Login</a>
+        <button type="submit">Register</button>
+      </div>
+    </form>
+  </div>
+</div>
