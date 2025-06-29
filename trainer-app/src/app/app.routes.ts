@@ -7,7 +7,7 @@ import {ProfileComponent} from './pages/profile/profile.component';
 import {CreateNftComponent} from './pages/create-nft/create-nft.component';
 import {MyNftComponent} from './pages/my-nft/my-nft.component';
 export const routes: Routes = [
-  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '', redirectTo: '/home/nfts', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   {

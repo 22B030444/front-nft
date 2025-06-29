@@ -12,3 +12,4 @@ import { FormsModule } from '@angular/forms';
 export class App {
   protected title = 'trainer-app';
 }
+localStorage.removeItem('loggedInUser');

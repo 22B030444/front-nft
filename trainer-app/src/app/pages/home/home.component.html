@@ -3,9 +3,9 @@
     <ul>
       <li routerLink="/login" class="login-register" routerLinkActive="active">Login/Register</li>
       <li routerLink="/home/nfts" routerLinkActive="active">NFT’s</li>
-      <li routerLink="/home/profile" routerLinkActive="active">Profile</li>
-      <li routerLink="/home/my-nfts" routerLinkActive="active">My NFT’s</li>
-      <li routerLink="/home/create-nft" routerLinkActive="active">Create nft</li>
+      <li *ngIf="isLoggedIn" routerLink="/home/profile" routerLinkActive="active">Profile</li>
+      <li *ngIf="isLoggedIn" routerLink="/home/my-nfts" routerLinkActive="active">My NFT’s</li>
+      <li *ngIf="isLoggedIn" routerLink="/home/create-nft" routerLinkActive="active">Create NFT</li>
     </ul>
   </nav>
 
