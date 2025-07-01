@@ -15,11 +15,7 @@ import {NgIf} from '@angular/common';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-  showLoginCard = false;
 
-  toggleLoginCard(): void {
-    this.showLoginCard = !this.showLoginCard;
-  }
   get isLoggedIn(): boolean {
     return !!localStorage.getItem('loggedInUser');
   }

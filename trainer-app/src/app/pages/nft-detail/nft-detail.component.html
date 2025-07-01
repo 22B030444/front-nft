@@ -1,0 +1,107 @@
+<ng-container *ngIf="nft; else notFound">
+  <div class="nft-detail-wrapper">
+
+    <!-- Back button -->
+    <button class="back-btn" (click)="goBack()">
+      <img src="/assets/icons/back.png" alt="Back to collection" />
+      <span>Back to Collection</span>
+    </button>
+
+    <!-- Top section: image + metadata -->
+    <div class="nft-detail-top">
+      <div class="nft-image-container">
+        <img
+          [src]="nft.image"
+          [alt]="nft.title"
+          class="nft-image"
+        />
+        <div class="like-badge">
+          <button class="like" (click)="toggleLike(nft.id)">
+            ❤ <span>{{ likes(nft.id) }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="nft-info-panel">
+        <h1 class="nft-title">{{ nft.title }}</h1>
+
+        <div class="nft-meta-row">
+          <div class="meta-label">Collection</div>
+          <div class="meta-value">{{ nft.subtitle }}</div>
+        </div>
+        <div class="nft-meta-row">
+          <div class="meta-label">Category</div>
+          <div class="meta-value">{{ nft.category }}</div>
+        </div>
+        <div class="nft-meta-row">
+          <div class="meta-label">Creator</div>
+          <div class="meta-value">{{ nft.username }}</div>
+        </div>
+
+        <div class="price-label">Price</div>
+        <div class="nft-price">\${{ nft.price }}</div>
+
+        <button class="buy-button" *ngIf="isLoggedIn" (click)="buyNft(nft);$event.stopPropagation()">Buy</button>
+      </div>
+    </div>
+
+    <div class="nft-description-comments">
+      <div class="description-block">
+        <h2 class="section-title">NFT description</h2>
+        <p class="description-text">{{ nft.subtitle }}</p>
+      </div>
+      <div class="comments-block">
+        <h2 class="section-title">Comments</h2>
+        <div class="comment-list">
+          <div *ngFor="let c of comments" class="comment-item">
+            <img src="/assets/avatars/user-1.png" class="comment-avatar" />
+            <div class="comment-text">{{ c }}</div>
+          </div>
+        </div>
+        <div class="comment-input" *ngIf="isLoggedIn">
+          <input
+            type="text"
+            placeholder="Write a comment..."
+            [(ngModel)]="newComment"
+          />
+          <button *ngIf="isLoggedIn" (click)="submitComment()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="other-nfts-section">
+      <h2 class="section-title">More by {{ nft.username }}</h2>
+      <div class="nft-grid">
+        <div  *ngFor="let nft of otherNfts"  class="nft-card" (click)="goToDetail(nft.id)"  >
+          <div class="card-bar" >
+            <img class="avatar" [src]="nft.ownerAvatar" alt="avatar" (click)="$event.stopPropagation()">
+            <p class="username">{{ nft.username || 'Unknown' }}</p>
+
+            <button class="like" (click)="toggleLike(nft.id); $event.stopPropagation()">
+              ❤ <span>{{ likes(nft.id) }}</span>
+            </button>
+            <button class="more">⋯</button>
+          </div>
+
+          <img class="nft-image" [src]="nft.image" [alt]="nft.title" >
+
+          <div class="nft-info">
+            <p class="nfts-title">{{ nft.title }}</p>
+            <p class="nft-subtitle">{{ nft.subtitle }}</p>
+
+            <p class="nft-category">
+              Category: <span>{{ nft.category }}</span>
+            </p>
+            <p class="nft-price">$ {{ nft.price }}</p>
+            <button class="buy-btn" *ngIf="isLoggedIn" (click)="buyNft(nft);$event.stopPropagation()"  >Buy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ng-container>
+
+<ng-template #notFound>
+  <p class="not-found">NFT not found.</p>
+</ng-template>

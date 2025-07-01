@@ -1,7 +1,7 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import {Router} from '@angular/router';
+import {Component, OnInit, inject, signal} from '@angular/core';
+import { CommonModule }            from '@angular/common';
+import { FormsModule }            from '@angular/forms';
+import {ActivatedRoute, Router, RouterModule} from '@angular/router';
 
 export interface NftCard {
   id: string;
@@ -10,81 +10,26 @@ export interface NftCard {
   image: string;
   title: string;
   subtitle: string;
-  type:string;
   category: string;
   price: number;
 }
 
 @Component({
-  selector: 'app-nfts',
+  selector: 'app-nft-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './nft.component.html',
-  styleUrls: ['./nft.component.css']
+  imports: [CommonModule, FormsModule, RouterModule],
+  templateUrl: './nft-detail.component.html',
+  styleUrls: ['./nft-detail.component.css']
 })
-export class NftComponent {
-
+export class NftDetailComponent {
+  private route = inject(ActivatedRoute);
   avatar = JSON.parse(localStorage.getItem('userProfile') || '{}')?.image || '/assets/avatars/default-user.png';
   username = JSON.parse(localStorage.getItem('userProfile') || '{}')?.username || '';
 
-  private demo: NftCard[] = [
-    {
-      id: 'demo-1',
-      ownerAvatar: 'assets/avatars/user-1.png',
-      username: 'alice',
-      image: 'assets/images/nft1.png',
-      title: 'Collection of nightmares',
-      subtitle: 'Nightmare (pt.15) 10x10',
-      type:'',
-      category: 'Games',
-      price: 49.99
-    },
-    {
-      id: 'demo-2',
-      ownerAvatar: 'assets/avatars/user-2.png',
-      username: 'bob',
-      image: 'assets/images/nft2.png',
-      title: 'Apes',
-      subtitle: 'King Bored Ape #2414',
-      type:'',
-      category: 'Collectibles',
-      price: 35
-    },
-    {
-      id: 'demo-3',
-      ownerAvatar: 'assets/avatars/user-3.png',
-      username: 'bob',
-      image: 'assets/images/nft3.png',
-      title: 'GALLERY_13',
-      subtitle: 'HorseNFT #1332',
-      type:'',
-      category: 'Music',
-      price: 75
-    },
-    {
-      id: 'demo-4',
-      ownerAvatar: 'assets/avatars/user-2.png',
-      username: 'bob',
-      image: 'assets/images/nft3.png',
-      title: 'GALLERY_13',
-      subtitle: 'HorseNFT #1332',
-      type:'',
-      category: 'Music',
-      price: 75
-    },
-    {
-      id: 'demo-5',
-      ownerAvatar: 'assets/avatars/user-3.png',
-      username: 'bob',
-      image: 'assets/images/nft4.png',
-      title: 'USSR',
-      subtitle: 'USSR 2.Edition 07',
-      type:'',
-      category: 'Collectibles',
-      price: 49.99
-    }
-  ];
-
+  nft: NftCard | null     = null;
+  comments: string[]      = [];
+  newComment: string      = '';
+  otherNfts: NftCard[]    = [];
   private userItems = signal<NftCard[]>([]);
   private allNfts = signal<NftCard[]>([]);
   filteredNfts = signal<NftCard[]>([]);
@@ -104,48 +49,45 @@ export class NftComponent {
           image: i.fileDataUrl,
           title: i.name,
           subtitle: i.description,
-          type:i.type,
           category: i.category,
           price: i.price
         }))
       );
     }
 
-    const filteredDemo = this.demo.filter(nft => !ownedIds.includes(nft.id));
 
-    const combined = [...filteredDemo, ...this.userItems()];
+    const combined = [...this.userItems()];
     this.allNfts.set(combined);
     this.filteredNfts.set(combined);
   }
-  ngOnInit() {
-    this.filteredNfts.set(this.allNfts());
-  }
-  goToDetail(id: string) {
-    this.router.navigate(['/home/nft-detail', id]);
+
+  submitComment(): void {
+    if (!this.nft || !this.newComment.trim()) return;
+
+    const commentStore = JSON.parse(localStorage.getItem('nftComments') || '{}');
+    commentStore[this.nft.id] = commentStore[this.nft.id] || [];
+    commentStore[this.nft.id].push(this.newComment.trim());
+    localStorage.setItem('nftComments', JSON.stringify(commentStore));
+
+    this.comments.push(this.newComment.trim());
+    this.newComment = '';
   }
 
-  applySearch() {
-    const term = this.searchTermInput.toLowerCase().trim();
-    this.filteredNfts.set(
-      this.allNfts().filter(nft =>
-        nft.title.toLowerCase().includes(term) ||
-        nft.category.toLowerCase().includes(term) ||
-        nft.price.toString().trim().includes(term)
-      )
-    );
+  goBack(): void {
+    history.back();
   }
-
   private likesStore: Record<string, number> = JSON.parse(localStorage.getItem('likes') ?? '{}');
 
   likes(id: string) {
     return this.likesStore[id] ?? 0;
   }
-
   toggleLike(id: string) {
     this.likesStore[id] = (this.likesStore[id] ?? 0) + 1;
     localStorage.setItem('likes', JSON.stringify(this.likesStore));
   }
-
+  goToDetail(id: string) {
+    this.router.navigate(['/home/nft-detail', id]);
+  }
   buyNft(nft: NftCard): void {
     const userLogin = localStorage.getItem('loggedInUser');
     if (!userLogin) {
@@ -171,7 +113,6 @@ export class NftComponent {
       description: nft.subtitle,
       price: nft.price,
       category: nft.category,
-      type:nft.type,
       fileDataUrl: nft.image
     };
 
@@ -183,6 +124,18 @@ export class NftComponent {
     this.filteredNfts.set(updated);
 
     alert('NFT added to your collection!');
+  }
+  ngOnInit(): void {
+    this.filteredNfts.set(this.allNfts());
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (!id) return;
+      const found = this.allNfts().find(n => n.id === id) || null;
+      this.nft = found;
+      const store = JSON.parse(localStorage.getItem('nftComments') || '{}');
+      this.comments = store[id] || [];
+      this.otherNfts = this.allNfts().filter(n => n.username === found?.username && n.id !== id);
+    });
   }
 
   get isLoggedIn(): boolean {
