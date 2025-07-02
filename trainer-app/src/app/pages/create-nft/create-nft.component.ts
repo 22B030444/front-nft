@@ -1,3 +1,4 @@
+// src/app/create-nft/create-nft.component.ts
 import { Component, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -12,6 +13,7 @@ export interface NftItem {
   description: string;
   fileDataUrl: string;
   fileName: string;
+  owner: string;
 }
 
 @Component({
@@ -35,9 +37,11 @@ export class CreateNftComponent {
   });
 
   previewUrl = signal<string | null>(null);
-  items = signal<NftItem[]>([]);
+  items     = signal<NftItem[]>([]);
+  private currentUser = localStorage.getItem('loggedInUser') || '';
 
   constructor() {
+
     const raw = localStorage.getItem('createdItems');
     if (raw) this.items.set(JSON.parse(raw));
 
@@ -47,9 +51,12 @@ export class CreateNftComponent {
   }
 
   onFileSelected(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file) return;
+    const file = (event.target as HTMLInputElement).files?.[0] || null;
     this.form.controls.file.setValue(file);
+    if (!file) {
+      this.previewUrl.set(null);
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => this.previewUrl.set(reader.result as string);
     reader.readAsDataURL(file);
@@ -63,41 +70,39 @@ export class CreateNftComponent {
 
   create(): void {
     if (this.form.invalid) {
-      alert('Please fill all fields');
+      alert('Пожалуйста, заполните все поля');
       return;
     }
-    const formValue = this.form.getRawValue();
+    const fv = this.form.getRawValue();
     const id = crypto.randomUUID();
 
     const saveItem = (fileUrl: string) => {
-      const item: NftItem = {
+      const newItem: NftItem = {
         id,
-        name: formValue.name,
-        category: formValue.category,
-        type: formValue.type,
-        price: formValue.price,
-        description: formValue.description,
-        fileDataUrl: fileUrl,
-        fileName: formValue.file?.name ?? ''
+        name:         fv.name,
+        category:     fv.category,
+        type:         fv.type,
+        price:        fv.price,
+        description:  fv.description,
+        fileDataUrl:  fileUrl,
+        fileName:     fv.file?.name ?? '',
+        owner:        this.currentUser
       };
 
-      this.items.set([...this.items(), item]);
+      this.items.set([...this.items(), newItem]);
+
       this.form.reset({ price: 0 });
       this.previewUrl.set(null);
 
-
       this.router.navigate(['/home/nft-success'], {
-        state: {
-          nftName: item.name,
-          imageUrl: fileUrl
-        }
+        state: { nftName: newItem.name, imageUrl: fileUrl }
       });
     };
 
-    if (formValue.file) {
+    if (fv.file) {
       const reader = new FileReader();
       reader.onload = () => saveItem(reader.result as string);
-      reader.readAsDataURL(formValue.file);
+      reader.readAsDataURL(fv.file);
     } else {
       saveItem('');
     }

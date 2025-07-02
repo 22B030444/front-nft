@@ -1,4 +1,5 @@
-import { Component, computed, signal, inject } from '@angular/core';
+// src/app/my-nft/my-nft.component.ts
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -11,66 +12,65 @@ export interface NftCard {
   subtitle: string;
   category: string;
   price: number;
+  owner: string;
 }
 
 @Component({
-  selector: 'app-nfts',
+  selector: 'app-my-nft',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './my-nft.component.html',
   styleUrls: ['./my-nft.component.css']
 })
-export class MyNftComponent {
+export class MyNftComponent implements OnInit {
 
-  avatar = JSON.parse(localStorage.getItem('userProfile') || '{}')?.image || '/assets/avatars/default-user.png';
-  username = JSON.parse(localStorage.getItem('userProfile') || '{}')?.username || '';
-  isLoggedIn = signal(!!this.username);
+  private currentUser = localStorage.getItem('loggedInUser') || '';
+  private profileKey  = `userProfile_${this.currentUser}`;
+  avatar = (JSON.parse(localStorage.getItem(this.profileKey) || '{}') as any).image
+    || '/assets/avatars/default-user.png';
+  username = (JSON.parse(localStorage.getItem(this.profileKey) || '{}') as any).username
+    || this.currentUser;
+  isLoggedIn = !!this.currentUser;
 
-  private userItems = signal<NftCard[]>([]);
-  private ownedItems = signal<NftCard[]>([]);
+  private userItems   = signal<NftCard[]>([]);
+  filteredNfts        = signal<NftCard[]>([]);
+  searchTermInput     = '';
 
-  constructor() {
-    const created = localStorage.getItem('createdItems');
-    if (created) {
-      const saved: any[] = JSON.parse(created);
-      this.userItems.set(
-        saved.map(i => ({
-          id: i.id,
-          ownerAvatar: this.avatar,
-          username: this.username,
-          image: i.fileDataUrl,
-          title: i.name,
-          subtitle: i.description,
-          category: i.category,
-          price: i.price
-        }))
-      );
-    }
-
-    const owned = localStorage.getItem('ownedItems');
-    if (owned) {
-      this.ownedItems.set(JSON.parse(owned));
-    }
-  }
-  searchTermInput = '';
-  filteredNfts = signal<NftCard[]>([]);
+  private likesStore: Record<string, number> =
+    JSON.parse(localStorage.getItem('likes') || '{}');
 
   ngOnInit() {
-    this.filteredNfts.set([ ...this.userItems()]);
+    const raw = localStorage.getItem('createdItems') || '[]';
+    const all: any[] = JSON.parse(raw);
+
+    const mine: NftCard[] = all
+      .filter(i => i.owner === this.currentUser)
+      .map(i => ({
+        id:           i.id,
+        ownerAvatar:  this.avatar,
+        username:     this.username,
+        image:        i.fileDataUrl,
+        title:        i.name,
+        subtitle:     i.subtitle || i.description,
+        category:     i.category,
+        price:        i.price,
+        owner:        i.owner
+      }));
+
+    this.userItems.set(mine);
+    this.filteredNfts.set(mine);
   }
 
   applySearch() {
     const term = this.searchTermInput.toLowerCase().trim();
     this.filteredNfts.set(
-      [ ...this.userItems()].filter(nft =>
+      this.userItems().filter(nft =>
         nft.title.toLowerCase().includes(term) ||
         nft.category.toLowerCase().includes(term) ||
         nft.price.toString().includes(term)
       )
     );
   }
-
-  private likesStore: Record<string, number> = JSON.parse(localStorage.getItem('likes') ?? '{}');
 
   likes(id: string) {
     return this.likesStore[id] ?? 0;
@@ -82,38 +82,48 @@ export class MyNftComponent {
   }
 
   buyNft(nft: NftCard): void {
-    const userLogin = localStorage.getItem('loggedInUser');
-    if (!userLogin) {
-      alert('Please login to buy NFTs');
+    if (!this.isLoggedIn) {
+      alert('Пожалуйста, войдите, чтобы купить NFT');
       return;
     }
 
-    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
-    const ownerAvatar = userProfile.image || '/assets/avatars/default-user.png';
-    const username = userLogin;
+    const raw = localStorage.getItem('createdItems') || '[]';
+    const all: any[] = JSON.parse(raw);
 
-    const myNfts = JSON.parse(localStorage.getItem('createdItems') || '[]');
-
-    const alreadyOwned = myNfts.find((i: any) => i.id === nft.id);
-    if (alreadyOwned) {
-      alert('You already own this NFT');
+    if (all.some(i => i.id === nft.id && i.owner === this.currentUser)) {
+      alert('Вы уже владеете этим NFT');
       return;
     }
 
-    myNfts.push({
-      id: nft.id,
-      image: nft.image,
-      name: nft.title,
-      description: nft.subtitle,
-      category: nft.category,
-      price: nft.price,
-      username,
-      fileDataUrl: nft.image
+    all.push({
+      id:          nft.id,
+      name:        nft.title,
+      subtitle:    nft.subtitle,
+      category:    nft.category,
+      price:       nft.price,
+      fileDataUrl: nft.image,
+      owner:       this.currentUser
     });
 
-    localStorage.setItem('createdItems', JSON.stringify(myNfts));
-    alert('NFT added to your collection!');
+    localStorage.setItem('createdItems', JSON.stringify(all));
+
+    const updated = all
+      .filter(i => i.owner === this.currentUser)
+      .map(i => ({
+        id:           i.id,
+        ownerAvatar:  this.avatar,
+        username:     this.username,
+        image:        i.fileDataUrl,
+        title:        i.name,
+        subtitle:     i.subtitle || i.description,
+        category:     i.category,
+        price:        i.price,
+        owner:        i.owner
+      }));
+
+    this.userItems.set(updated);
+    this.filteredNfts.set(updated);
+
+    alert('NFT добавлен в вашу коллекцию!');
   }
-
-
 }

@@ -1,13 +1,11 @@
 <ng-container *ngIf="nft; else notFound">
   <div class="nft-detail-wrapper">
 
-    <!-- Back button -->
     <button class="back-btn" (click)="goBack()">
       <img src="/assets/icons/back.png" alt="Back to collection" />
       <span>Back to Collection</span>
     </button>
 
-    <!-- Top section: image + metadata -->
     <div class="nft-detail-top">
       <div class="nft-image-container">
         <img
@@ -54,7 +52,7 @@
         <h2 class="section-title">Comments</h2>
         <div class="comment-list">
           <div *ngFor="let c of comments" class="comment-item">
-            <img src="/assets/avatars/user-1.png" class="comment-avatar" />
+            <img class="avatar" [src]="nft.ownerAvatar" alt="avatar">
             <div class="comment-text">{{ c }}</div>
           </div>
         </div>

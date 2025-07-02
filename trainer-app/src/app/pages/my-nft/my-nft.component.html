@@ -36,7 +36,7 @@
         <p class="nft-price">$ {{ nft.price }}</p>
         <button
           class="buy-btn"
-          *ngIf="isLoggedIn()"
+          *ngIf="isLoggedIn"
           (click)="buyNft(nft)"
         >
           Buy
