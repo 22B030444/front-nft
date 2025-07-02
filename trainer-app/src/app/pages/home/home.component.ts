@@ -19,8 +19,4 @@ export class HomeComponent {
   get isLoggedIn(): boolean {
     return !!localStorage.getItem('loggedInUser');
   }
-
-
-
-
 }

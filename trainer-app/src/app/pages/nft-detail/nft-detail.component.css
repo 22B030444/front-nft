@@ -130,20 +130,32 @@
   border-radius: 12px;
   margin-bottom: 16px;
 }
+
 .comment-item {
   display: flex;
   gap: 12px;
-  margin-bottom: 12px;
+  align-items: center;
+  padding: 8px 0;                     /* внутренние отступы сверху/снизу */
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
+
+.comment-item:last-child {
+  border-bottom: none;               /* у последнего — без линии */
+}
+
 .comment-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
+
 .comment-text {
   font-size: 14px;
   color: #fff;
+  word-break: break-word;
 }
+
 .comment-input {
   display: flex;
   gap: 8px;

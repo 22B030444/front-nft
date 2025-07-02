@@ -26,14 +26,11 @@ export interface NftCard {
 export class NftDetailComponent implements OnInit {
   private route  = inject(ActivatedRoute);
   private router = inject(Router);
-
-  // Весь список NFT
   private allNfts      = signal<NftCard[]>([]);
-  // Другие NFT того же автора
+  private loggedInUser = localStorage.getItem('loggedInUser') || '';
+  currentUserAvatar: string = '/assets/avatars/default-user.png';
   otherNfts: NftCard[] = [];
-  // Текущая карточка
   nft: NftCard | null = null;
-
   comments: string[] = [];
   newComment = '';
 
@@ -45,20 +42,26 @@ export class NftDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Загружаем все созданные/купленные NFT
+    // 1) Подгружаем и устанавливаем аватар текущего пользователя
+    if (this.loggedInUser) {
+      const myProf = JSON.parse(
+        localStorage.getItem(`userProfile_${this.loggedInUser}`) || '{}'
+      );
+      this.currentUserAvatar = myProf.image || this.currentUserAvatar;
+    }
+
+    // 2) Строим список всех NFT
     const raw = localStorage.getItem('createdItems') || '[]';
     const list: any[] = JSON.parse(raw);
-
-    // Преобразуем в NftCard[], подтягивая профиль каждого owner
     const cards: NftCard[] = list.map(i => {
-      const owner = i.owner;
-      const profKey = `userProfile_${owner}`;
-      const prof = JSON.parse(localStorage.getItem(profKey) || '{}');
+      const prof = JSON.parse(
+        localStorage.getItem(`userProfile_${i.owner}`) || '{}'
+      );
       return {
         id:           i.id,
-        owner,
+        owner:        i.owner,
         ownerAvatar:  prof.image || '/assets/avatars/default-user.png',
-        username:     prof.username || owner,
+        username:     prof.username || i.owner,
         image:        i.fileDataUrl,
         title:        i.name,
         subtitle:     i.subtitle || i.description,
@@ -68,15 +71,14 @@ export class NftDetailComponent implements OnInit {
     });
     this.allNfts.set(cards);
 
-    // Слушаем параметр роутера
+    // 3) Подписываемся на изменения параметра id
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (!id) {
         this.router.navigate(['/home/nfts']);
         return;
       }
-
-      // Находим выбранный NFT
+      // Текущий NFT
       this.nft = this.allNfts().find(n => n.id === id) || null;
       if (!this.nft) {
         alert('NFT не найден');
@@ -84,11 +86,11 @@ export class NftDetailComponent implements OnInit {
         return;
       }
 
-      // Загружаем комментарии
+      // Комментарии
       const store = JSON.parse(localStorage.getItem('nftComments') || '{}');
       this.comments = store[id] || [];
 
-      // Формируем список других NFT того же автора
+      // Другие NFT того же владельца
       this.otherNfts = this.allNfts()
         .filter(n => n.owner === this.nft!.owner && n.id !== id);
     });
@@ -114,8 +116,6 @@ export class NftDetailComponent implements OnInit {
     this.likesStore[id] = (this.likesStore[id] ?? 0) + 1;
     localStorage.setItem('likes', JSON.stringify(this.likesStore));
   }
-
-  // Теперь принимает nft: NftCard
   buyNft(nft: NftCard): void {
     if (!this.isLoggedIn) {
       alert('Пожалуйста, войдите, чтобы купить NFT');
@@ -144,8 +144,6 @@ export class NftDetailComponent implements OnInit {
 
     alert('NFT добавлен в вашу коллекцию!');
   }
-
-  // Публичный метод навигации
   goToDetail(id: string): void {
     this.router.navigate(['/home/nft-detail', id]);
   }

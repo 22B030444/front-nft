@@ -52,7 +52,7 @@
         <h2 class="section-title">Comments</h2>
         <div class="comment-list">
           <div *ngFor="let c of comments" class="comment-item">
-            <img class="avatar" [src]="nft.ownerAvatar" alt="avatar">
+            <img class="avatar comment-avatar" [src]="currentUserAvatar" alt="avatar">
             <div class="comment-text">{{ c }}</div>
           </div>
         </div>

@@ -34,9 +34,7 @@ export class NftComponent implements OnInit {
   username: string = '';
   isLoggedIn: boolean = false;
 
-  // сигнал для всего списка
   private allNfts     = signal<NftCard[]>([]);
-  // публично показываем отфильтрованный под поиск
   filteredNfts       = signal<NftCard[]>([]);
   searchTermInput    = '';
 
@@ -44,7 +42,6 @@ export class NftComponent implements OnInit {
     JSON.parse(localStorage.getItem('likes') || '{}');
 
   ngOnInit() {
-    // подгружаем профиль
     const profRaw = localStorage.getItem(this.profileKey);
     if (profRaw) {
       const prof = JSON.parse(profRaw);
@@ -53,32 +50,40 @@ export class NftComponent implements OnInit {
     }
     this.isLoggedIn = !!this.currentUser;
 
-    // формируем список впервые
     this.refreshLists();
   }
 
   private refreshLists() {
-    // читаем всё из createdItems
     const raw = localStorage.getItem('createdItems') || '[]';
-    const created = JSON.parse(raw) as any[];
+    const arr: any[] = JSON.parse(raw);
 
-    // разделяем: свои и чужие
+    let migrated = false;
+    const fixed = arr.map(item => {
+      if (!item.owner) {
+        migrated = true;
+        return { ...item, owner: this.currentUser };
+      }
+      return item;
+    });
+
+    if (migrated) {
+      localStorage.setItem('createdItems', JSON.stringify(fixed));
+    }
+    const created = fixed;
     const ownItems: NftCard[] = created
       .filter(i => i.owner === this.currentUser)
       .map(i => this.toCard(i, this.avatar, this.username));
 
     const otherItems: NftCard[] = created
-      .filter(i => i.owner !== this.currentUser)
+      .filter(i => i.owner && i.owner !== this.currentUser)
       .map(i => {
-        const key = `userProfile_${i.owner}`;
-        const prof = JSON.parse(localStorage.getItem(key) || '{}');
+        const prof = JSON.parse(localStorage.getItem(`userProfile_${i.owner}`) || '{}');
         return this.toCard(i,
-          prof.image || '/assets/avatars/default-user.png',
-          prof.username|| i.owner
+          prof.image    || '/assets/avatars/default-user.png',
+          prof.username || i.owner
         );
       });
 
-    // демо-карты, которых нет ни в одном createdItems
     const demo: Omit<NftCard, 'ownerAvatar'|'username'|'owner'>[] = [
       { id: 'demo-1', image: 'assets/images/nft1.png', title: 'Collection of nightmares', subtitle: 'Nightmare (pt.15) 10×10', type:'', category: 'Games',        price: 49.99 },
       { id: 'demo-2', image: 'assets/images/nft2.png', title: 'Apes',                  subtitle: 'King Bored Ape #2414',      type:'', category: 'Collectibles', price: 35    },
@@ -95,7 +100,6 @@ export class NftComponent implements OnInit {
         owner:        'market'
       }));
 
-    // объединяем: сначала чужие+демо, потом свои
     const combined = [...otherItems, ...demoItems, ...ownItems];
     this.allNfts.set(combined);
     this.filteredNfts.set(combined);
@@ -142,18 +146,17 @@ export class NftComponent implements OnInit {
       return;
     }
 
-    // читаем весь массив
     const raw = localStorage.getItem('createdItems') || '[]';
     const all = JSON.parse(raw) as any[];
 
-    // уже куплено?
     if (all.some(i => i.id === nft.id && i.owner === this.currentUser)) {
       alert('Вы уже владеете этим NFT');
       return;
     }
 
-    // пушим новую запись с полем owner = currentUser
-    all.push({
+    const withoutOld = all.filter(i => i.id !== nft.id);
+
+    withoutOld.push({
       id:          nft.id,
       name:        nft.title,
       subtitle:    nft.subtitle,
@@ -164,13 +167,10 @@ export class NftComponent implements OnInit {
       owner:       this.currentUser
     });
 
-    localStorage.setItem('createdItems', JSON.stringify(all));
-    alert('NFT добавлен в вашу коллекцию!');
-
-    // пересобираем списки, чтобы купленный ушёл из чужих
+    localStorage.setItem('createdItems', JSON.stringify(withoutOld));
+    alert('NFT успешно передан в вашу коллекцию!');
     this.refreshLists();
   }
-
   goToDetail(id: string) {
     this.router.navigate(['/home/nft-detail', id]);
   }
