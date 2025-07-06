@@ -35,14 +35,12 @@ body, html {
   font-weight: 700;
   color: #ffffff;
   margin: 0 0 12px 0;
-  letter-spacing: -0.5%;
 }
 
 label {
   font-size: 16px;
   font-weight: 300;
   color: rgba(255, 255, 255, 0.5);
-  letter-spacing: 0.5%;
   margin-bottom: 6px;
   display: block;
 }

@@ -15,7 +15,6 @@ import {NgIf} from '@angular/common';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-
   get isLoggedIn(): boolean {
     return !!localStorage.getItem('loggedInUser');
   }

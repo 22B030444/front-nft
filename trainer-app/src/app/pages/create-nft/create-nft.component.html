@@ -14,7 +14,6 @@
   <form [formGroup]="form" class="form-grid" (ngSubmit)="create()">
     <div class="upload-box">
       <ng-container *ngIf="!previewUrl(); else preview">
-<!--        <img src="/assets/icons/upload-placeholder.svg" alt="Upload" width="48" height="48" />-->
         <p class="upload-title">Upload File</p>
         <p class="upload-hint">
           Max size 100 Mb, PNG / GIF / JPG / MP4 / WEBP / MP3<br>

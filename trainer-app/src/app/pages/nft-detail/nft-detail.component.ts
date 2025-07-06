@@ -1,4 +1,4 @@
-// src/app/pages/nft-detail/nft-detail.component.ts
+
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -42,7 +42,7 @@ export class NftDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // 1) Подгружаем и устанавливаем аватар текущего пользователя
+
     if (this.loggedInUser) {
       const myProf = JSON.parse(
         localStorage.getItem(`userProfile_${this.loggedInUser}`) || '{}'
@@ -50,7 +50,6 @@ export class NftDetailComponent implements OnInit {
       this.currentUserAvatar = myProf.image || this.currentUserAvatar;
     }
 
-    // 2) Строим список всех NFT
     const raw = localStorage.getItem('createdItems') || '[]';
     const list: any[] = JSON.parse(raw);
     const cards: NftCard[] = list.map(i => {
@@ -71,14 +70,12 @@ export class NftDetailComponent implements OnInit {
     });
     this.allNfts.set(cards);
 
-    // 3) Подписываемся на изменения параметра id
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (!id) {
         this.router.navigate(['/home/nfts']);
         return;
       }
-      // Текущий NFT
       this.nft = this.allNfts().find(n => n.id === id) || null;
       if (!this.nft) {
         alert('NFT не найден');
