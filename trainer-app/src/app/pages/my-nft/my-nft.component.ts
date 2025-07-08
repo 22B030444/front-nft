@@ -1,4 +1,3 @@
-// src/app/my-nft/my-nft.component.ts
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +11,7 @@ export interface NftCard {
   subtitle: string;
   category: string;
   price: number;
-  owner: string;
+  email: string;
 }
 
 @Component({
@@ -44,7 +43,7 @@ export class MyNftComponent implements OnInit {
     const all: any[] = JSON.parse(raw);
 
     const mine: NftCard[] = all
-      .filter(i => i.owner === this.currentUser)
+      .filter(i => i.email === this.currentUser)
       .map(i => ({
         id:           i.id,
         ownerAvatar:  this.avatar,
@@ -54,7 +53,7 @@ export class MyNftComponent implements OnInit {
         subtitle:     i.subtitle || i.description,
         category:     i.category,
         price:        i.price,
-        owner:        i.owner
+        email:        i.email
       }));
 
     this.userItems.set(mine);
@@ -90,40 +89,9 @@ export class MyNftComponent implements OnInit {
     const raw = localStorage.getItem('createdItems') || '[]';
     const all: any[] = JSON.parse(raw);
 
-    if (all.some(i => i.id === nft.id && i.owner === this.currentUser)) {
+    if (all.some(i => i.id === nft.id && i.email === this.currentUser)) {
       alert('Вы уже владеете этим NFT');
       return;
     }
-
-    all.push({
-      id:          nft.id,
-      name:        nft.title,
-      subtitle:    nft.subtitle,
-      category:    nft.category,
-      price:       nft.price,
-      fileDataUrl: nft.image,
-      owner:       this.currentUser
-    });
-
-    localStorage.setItem('createdItems', JSON.stringify(all));
-
-    const updated = all
-      .filter(i => i.owner === this.currentUser)
-      .map(i => ({
-        id:           i.id,
-        ownerAvatar:  this.avatar,
-        username:     this.username,
-        image:        i.fileDataUrl,
-        title:        i.name,
-        subtitle:     i.subtitle || i.description,
-        category:     i.category,
-        price:        i.price,
-        owner:        i.owner
-      }));
-
-    this.userItems.set(updated);
-    this.filteredNfts.set(updated);
-
-    alert('NFT добавлен в вашу коллекцию!');
   }
 }

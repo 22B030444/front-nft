@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {FormsModule} from '@angular/forms';
 
@@ -10,7 +10,8 @@ import {FormsModule} from '@angular/forms';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
-  constructor(private router: Router) {}
+
+  private router = inject(Router);
 
   login: string = '';
   password: string = '';

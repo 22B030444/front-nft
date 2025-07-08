@@ -1,5 +1,4 @@
-// src/app/pages/nft/nft.component.ts
-import { Component, OnInit, signal } from '@angular/core';
+import {Component, inject, OnInit, signal} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,7 +13,7 @@ export interface NftCard {
   type: string;
   category: string;
   price: number;
-  owner: string;
+  email: string;
 }
 
 @Component({
@@ -25,8 +24,8 @@ export interface NftCard {
   styleUrls: ['./nft.component.css']
 })
 export class NftComponent implements OnInit {
-  constructor(private router: Router) {}
 
+  private router = inject(Router);
   private currentUser = localStorage.getItem('loggedInUser') || '';
   private profileKey  = `userProfile_${this.currentUser}`;
 
@@ -59,9 +58,9 @@ export class NftComponent implements OnInit {
 
     let migrated = false;
     const fixed = arr.map(item => {
-      if (!item.owner) {
+      if (!item.email) {
         migrated = true;
-        return { ...item, owner: this.currentUser };
+        return { ...item, email: this.currentUser };
       }
       return item;
     });
@@ -71,20 +70,20 @@ export class NftComponent implements OnInit {
     }
     const created = fixed;
     const ownItems: NftCard[] = created
-      .filter(i => i.owner === this.currentUser)
+      .filter(i => i.email === this.currentUser)
       .map(i => this.toCard(i, this.avatar, this.username));
 
     const otherItems: NftCard[] = created
-      .filter(i => i.owner && i.owner !== this.currentUser)
+      .filter(i => i.email && i.email !== this.currentUser)
       .map(i => {
-        const prof = JSON.parse(localStorage.getItem(`userProfile_${i.owner}`) || '{}');
+        const prof = JSON.parse(localStorage.getItem(`userProfile_${i.email}`) || '{}');
         return this.toCard(i,
           prof.image    || '/assets/avatars/default-user.png',
-          prof.username || i.owner
+          prof.username || i.email
         );
       });
 
-    const demo: Omit<NftCard, 'ownerAvatar'|'username'|'owner'>[] = [
+    const demo: Omit<NftCard, 'ownerAvatar'|'username'|'email'>[] = [
       { id: 'demo-1', image: 'assets/images/nft1.png', title: 'Collection of nightmares', subtitle: 'Nightmare (pt.15) 10×10', type:'', category: 'Games',        price: 49.99 },
       { id: 'demo-2', image: 'assets/images/nft2.png', title: 'Apes',                  subtitle: 'King Bored Ape #2414',      type:'', category: 'Collectibles', price: 35    },
       { id: 'demo-3', image: 'assets/images/nft3.png', title: 'GALLERY_13',            subtitle: 'HorseNFT #1332',           type:'', category: 'Music',        price: 75    },
@@ -95,9 +94,9 @@ export class NftComponent implements OnInit {
       .filter(d => !created.some(c => c.id === d.id))
       .map(d => ({
         ...d,
-        ownerAvatar:  '/assets/avatars/default-user.png',
+        ownerAvatar:  '/assets/avatars/user-1.png',
         username:     'market',
-        owner:        'market'
+        email:        'market'
       }));
 
     const combined = [...otherItems, ...demoItems, ...ownItems];
@@ -116,7 +115,7 @@ export class NftComponent implements OnInit {
       type:         i.type,
       category:     i.category,
       price:        i.price,
-      owner:        i.owner
+      email:        i.email
     };
   }
 
@@ -149,7 +148,7 @@ export class NftComponent implements OnInit {
     const raw = localStorage.getItem('createdItems') || '[]';
     const all = JSON.parse(raw) as any[];
 
-    if (all.some(i => i.id === nft.id && i.owner === this.currentUser)) {
+    if (all.some(i => i.id === nft.id && i.email === this.currentUser)) {
       alert('Вы уже владеете этим NFT');
       return;
     }
@@ -164,7 +163,7 @@ export class NftComponent implements OnInit {
       type:        nft.type,
       price:       nft.price,
       fileDataUrl: nft.image,
-      owner:       this.currentUser
+      email:       this.currentUser
     });
 
     localStorage.setItem('createdItems', JSON.stringify(withoutOld));

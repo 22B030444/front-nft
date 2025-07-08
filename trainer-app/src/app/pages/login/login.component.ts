@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component, inject} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {FormsModule} from '@angular/forms';
 
@@ -13,7 +13,7 @@ export class LoginComponent {
   login: string = '';
   password: string = '';
 
-  constructor(private router: Router) {}
+  private router = inject(Router);
 
   onSubmit(): void {
     const login = this.login;

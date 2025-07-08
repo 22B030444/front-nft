@@ -13,7 +13,7 @@ export interface NftItem {
   description: string;
   fileDataUrl: string;
   fileName: string;
-  owner: string;
+  email: string;
 }
 
 @Component({
@@ -86,7 +86,7 @@ export class CreateNftComponent {
         description:  fv.description,
         fileDataUrl:  fileUrl,
         fileName:     fv.file?.name ?? '',
-        owner:        this.currentUser
+        email:        this.currentUser
       };
 
       this.items.set([...this.items(), newItem]);

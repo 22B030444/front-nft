@@ -6,7 +6,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
 export interface NftCard {
   id: string;
-  owner: string;
+  email: string;
   ownerAvatar: string;
   username: string;
   image: string;
@@ -54,13 +54,13 @@ export class NftDetailComponent implements OnInit {
     const list: any[] = JSON.parse(raw);
     const cards: NftCard[] = list.map(i => {
       const prof = JSON.parse(
-        localStorage.getItem(`userProfile_${i.owner}`) || '{}'
+        localStorage.getItem(`userProfile_${i.email}`) || '{}'
       );
       return {
         id:           i.id,
-        owner:        i.owner,
+        email:        i.email,
         ownerAvatar:  prof.image || '/assets/avatars/default-user.png',
-        username:     prof.username || i.owner,
+        username:     prof.username || i.email,
         image:        i.fileDataUrl,
         title:        i.name,
         subtitle:     i.subtitle || i.description,
@@ -83,13 +83,11 @@ export class NftDetailComponent implements OnInit {
         return;
       }
 
-      // Комментарии
       const store = JSON.parse(localStorage.getItem('nftComments') || '{}');
       this.comments = store[id] || [];
 
-      // Другие NFT того же владельца
       this.otherNfts = this.allNfts()
-        .filter(n => n.owner === this.nft!.owner && n.id !== id);
+        .filter(n => n.email === this.nft!.email && n.id !== id);
     });
   }
 
@@ -123,7 +121,7 @@ export class NftDetailComponent implements OnInit {
     const raw = localStorage.getItem('createdItems') || '[]';
     const all = JSON.parse(raw) as any[];
 
-    if (all.some(i => i.id === nft.id && i.owner === user)) {
+    if (all.some(i => i.id === nft.id && i.email === user)) {
       alert('Вы уже владеете этим NFT');
       return;
     }
@@ -135,7 +133,7 @@ export class NftDetailComponent implements OnInit {
       category:    nft.category,
       price:       nft.price,
       fileDataUrl: nft.image,
-      owner:       user
+      email:       user
     });
     localStorage.setItem('createdItems', JSON.stringify(all));
 
